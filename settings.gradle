@@ -1,2 +1,3 @@
-include ':BoltsTest'
 include ':Bolts'
+include ':BoltsTest'
+include ':BoltsJavaTest'

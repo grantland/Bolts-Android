@@ -9,8 +9,6 @@
  */
 package bolts;
 
-import android.os.Looper;
-
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
@@ -193,35 +191,6 @@ public class TaskTest extends TestCase {
     });
   }
 
-  public void testContinueOnUiThread() {
-    assertNotSame(Looper.myLooper(), Looper.getMainLooper());
-
-    runTaskTest(new Callable<Task<?>>() {
-      @Override
-      public Task<Void> call() throws Exception {
-        return Task.call(new Callable<Void>() {
-          @Override
-          public Void call() throws Exception {
-            assertSame(Looper.myLooper(), Looper.getMainLooper());
-            return null;
-          }
-        }, Task.UI_THREAD_EXECUTOR).continueWith(new Continuation<Void, Void>() {
-          @Override
-          public Void then(Task<Void> task) throws Exception {
-            assertNotSame(Looper.myLooper(), Looper.getMainLooper());
-            return null;
-          }
-        }, Task.BACKGROUND_EXECUTOR).continueWith(new Continuation<Void, Void>() {
-          @Override
-          public Void then(Task<Void> task) throws Exception {
-            assertSame(Looper.myLooper(), Looper.getMainLooper());
-            return null;
-          }
-        }, Task.UI_THREAD_EXECUTOR);
-      }
-    });
-  }
-
   public void testWhenAllSuccess() {
     runTaskTest(new Callable<Task<?>>() {
       @Override
@@ -231,7 +200,7 @@ public class TaskTest extends TestCase {
           Task<Void> task = Task.callInBackground(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-              Thread.sleep((long) (Math.random() * 100));
+              Thread.sleep((long) (Math.random() * 1000));
               return null;
             }
           });
@@ -266,7 +235,7 @@ public class TaskTest extends TestCase {
           Task<Void> task = Task.callInBackground(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-              Thread.sleep((long) (Math.random() * 100));
+              Thread.sleep((long) (Math.random() * 1000));
               if (number == 10) {
                 throw error;
               }
@@ -307,7 +276,7 @@ public class TaskTest extends TestCase {
           Task<Void> task = Task.callInBackground(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-              Thread.sleep((long) (Math.random() * 100));
+              Thread.sleep((long) (Math.random() * 1000));
               if (number == 10 || number == 11) {
                 throw error;
               }
@@ -324,9 +293,9 @@ public class TaskTest extends TestCase {
             assertFalse(task.isCancelled());
 
             assertTrue(task.getError() instanceof AggregateException);
-            assertEquals(2, ((AggregateException) task.getError()).getErrors().size());
-            assertEquals(error, ((AggregateException) task.getError()).getErrors().get(0));
-            assertEquals(error, ((AggregateException) task.getError()).getErrors().get(1));
+            assertEquals(2, ((AggregateException)task.getError()).getErrors().size());
+            assertEquals(error, ((AggregateException)task.getError()).getErrors().get(0));
+            assertEquals(error, ((AggregateException)task.getError()).getErrors().get(1));
 
             for (Task<Void> t : tasks) {
               assertTrue(t.isCompleted());
@@ -350,7 +319,7 @@ public class TaskTest extends TestCase {
           Task.callInBackground(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-              Thread.sleep((long) (Math.random() * 100));
+              Thread.sleep((long) (Math.random() * 1000));
               if (number == 10) {
                 tcs.setCancelled();
               } else {
